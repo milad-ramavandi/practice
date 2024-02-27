@@ -15,6 +15,7 @@ const SelectedActivity = ({formik}) => {
             <span>{formik.errors.activity}</span>
           ) : null
         }
+        placeholder="low activity"
       >
         {(item) => <SelectItem key={item.id}>{item.type}</SelectItem>}
       </Select>

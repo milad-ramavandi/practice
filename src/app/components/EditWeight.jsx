@@ -2,7 +2,7 @@ import { Input, Select, SelectItem } from "@nextui-org/react";
 import React from "react";
 import { dataWeight } from "../data/data";
 
-const EditWeight = ({formik}) => {
+const EditWeight = ({ formik }) => {
   return (
     <div className=" space-y-4">
       <h3 className=" text-center">Edit Weight</h3>
@@ -16,7 +16,7 @@ const EditWeight = ({formik}) => {
               <span>{formik.errors.baseWeight}</span>
             ) : null
           }
-          placeholder="20"
+          placeholder="70"
         />
         /
         <Input
@@ -28,7 +28,7 @@ const EditWeight = ({formik}) => {
               <span>{formik.errors.decimalWeight}</span>
             ) : null
           }
-          placeholder="0.5"
+          placeholder="0.8"
         />
         <Select
           items={dataWeight}
@@ -39,6 +39,7 @@ const EditWeight = ({formik}) => {
               <span>{formik.errors.unitWeight}</span>
             ) : null
           }
+          placeholder="kg"
         >
           {(item) => <SelectItem key={item.id}>{item.unit}</SelectItem>}
         </Select>

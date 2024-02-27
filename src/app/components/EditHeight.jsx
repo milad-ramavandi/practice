@@ -16,6 +16,7 @@ const EditHeight = ({ formik }) => {
               <span>{formik.errors.baseHeight}</span>
             ) : null
           }
+          placeholder="160"
         />
         /
         <Input
@@ -27,6 +28,7 @@ const EditHeight = ({ formik }) => {
               <span>{formik.errors.decimalHeight}</span>
             ) : null
           }
+          placeholder="0.77"
         />
         <Select
           items={dataHeight}
@@ -37,6 +39,7 @@ const EditHeight = ({ formik }) => {
               <span>{formik.errors.unitHeight}</span>
             ) : null
           }
+          placeholder="cm"
         >
           {(item) => <SelectItem key={item.id}>{item.unit}</SelectItem>}
         </Select>
