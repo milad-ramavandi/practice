@@ -29,7 +29,7 @@ const UserInfo = () => {
       activity: "",
     },
     validationSchema: Yup.object({
-      imageURL: Yup.mixed().required("Chosse your file"),
+      imageURL: Yup.mixed().required("Chosse your image for profile"),
       baseWeight: Yup.string().matches(/^[1-9][0-9]*$/, 'Weight is not valid').required("fill the input"),
       decimalWeight: Yup.string().matches( /^(0(\.\d+))$/, 'Choose number between 0 and less than 1').required("fill the input"),
       unitWeight: Yup.string().required("Select one of the option"),
@@ -52,7 +52,7 @@ const UserInfo = () => {
               className="flex flex-col space-y-6"
               onSubmit={formik.handleSubmit}
             >
-              <EditPicture formik={formik} inputName='imageURL'/>
+              <EditPicture formik={formik}/>
               <EditWeight formik={formik} />
               <EditHeight formik={formik} />
               <SelectedActivity formik={formik} />

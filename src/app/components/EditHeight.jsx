@@ -2,18 +2,18 @@ import React from "react";
 import { dataHeight } from "../data/data";
 import { Input, Select, SelectItem } from "@nextui-org/react";
 
-const EditHeight = ({ formik }) => {
+const EditHeight = (props) => {
   return (
     <div className=" space-y-4">
       <h3 className=" text-center">Edit Height</h3>
       <div className="flex gap-x-2">
         <Input
           type="text"
-          {...formik.getFieldProps("baseHeight")}
-          color={formik.errors.baseHeight ? "danger" : "default"}
+          {...props.formik.getFieldProps("baseHeight")}
+          color={props.formik.errors.baseHeight ? "danger" : "default"}
           errorMessage={
-            formik.touched.baseHeight && formik.errors.baseHeight ? (
-              <span>{formik.errors.baseHeight}</span>
+            props.formik.touched.baseHeight && props.formik.errors.baseHeight ? (
+              <span>{props.formik.errors.baseHeight}</span>
             ) : null
           }
           placeholder="160"
@@ -21,22 +21,22 @@ const EditHeight = ({ formik }) => {
         /
         <Input
           type="text"
-          {...formik.getFieldProps("decimalHeight")}
-          color={formik.errors.decimalHeight ? "danger" : "default"}
+          {...props.formik.getFieldProps("decimalHeight")}
+          color={props.formik.errors.decimalHeight ? "danger" : "default"}
           errorMessage={
-            formik.touched.decimalHeight && formik.errors.decimalHeight ? (
-              <span>{formik.errors.decimalHeight}</span>
+            props.formik.touched.decimalHeight && props.formik.errors.decimalHeight ? (
+              <span>{props.formik.errors.decimalHeight}</span>
             ) : null
           }
           placeholder="0.77"
         />
         <Select
           items={dataHeight}
-          {...formik.getFieldProps("unitHeight")}
-          color={formik.errors.unitHeight ? "danger" : "default"}
+          {...props.formik.getFieldProps("unitHeight")}
+          color={props.formik.errors.unitHeight ? "danger" : "default"}
           errorMessage={
-            formik.touched.unitHeight && formik.errors.unitHeight ? (
-              <span>{formik.errors.unitHeight}</span>
+            props.formik.touched.unitHeight && props.formik.errors.unitHeight ? (
+              <span>{props.formik.errors.unitHeight}</span>
             ) : null
           }
           placeholder="cm"
