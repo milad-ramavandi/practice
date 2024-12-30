@@ -20,11 +20,11 @@ const PostCardLists = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modeModal, setModeModal] = useState<string>("")
-  const [postID, setPostID] = useState<number>(1);
+  const [post, setPost] = useState<IPost>({title:"", body:""});
   const queryClient = useQueryClient();
-  const deletePost = (postID: number) => {
+  const deletePost = (post: IPost) => {
     const promise = async () => {
-      await axios.delete(`${process.env.BASE_URL}posts/${postID}`);
+      await axios.delete(`${process.env.BASE_URL}posts/${post.id}`);
     };
 
     toast.promise(promise, {
@@ -35,15 +35,15 @@ const PostCardLists = ({
 
     queryClient.invalidateQueries("posts");
   };
-  const showExpandModal = (postID: number) => {
+  const showExpandModal = (post: IPost) => {
     setModeModal("expand")
     setIsModalOpen(true);
-    setPostID(postID);
+    setPost({title:post.title, body:post?.body});
   };
-  const showEditModal = (postID: number) => {
+  const showEditModal = (post: IPost) => {
     setModeModal("edit");
     setIsModalOpen(true);
-    setPostID(postID);
+    setPost({id:post.id, title:post.title, body:post?.body});
   };
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -59,9 +59,9 @@ const PostCardLists = ({
               key={item.id}
               title={item.title}
               actions={[
-                <Delete onClick={() => deletePost(item.id as number)} />,
-                <Expand onClick={() => showExpandModal(item.id as number)} />,
-                <Edit onClick={() => showEditModal(item.id as number)}/>
+                <Delete onClick={() => deletePost(item)} />,
+                <Expand onClick={() => showExpandModal(item)} />,
+                <Edit onClick={() => showEditModal(item)}/>
               ]}
               className="max-w-[300px]"
               classNames={{
@@ -73,7 +73,7 @@ const PostCardLists = ({
           ))
         )}
       </div>
-      <PostModal postID={postID} open={isModalOpen} onCancel={handleCancel} mode={modeModal}/>
+      <PostModal post={post} open={isModalOpen} onCancel={handleCancel} mode={modeModal}/>
     </>
   );
 };

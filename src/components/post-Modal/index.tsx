@@ -1,36 +1,22 @@
 "use client";
 import { IPost } from "@/types/post";
 import { Button, Modal } from "antd";
-import TextArea from "antd/es/input/TextArea";
-import React, { ChangeEventHandler, useState } from "react";
-import { useQuery } from "react-query";
+import React, { ChangeEventHandler, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
-const nameArray = [
-  { id: 1, name: "title" },
-  { id: 2, name: "body" },
-];
+import TransformTextarea from "../transform-textarea";
 
 const PostModal = ({
   mode,
-  postID,
+  post,
   open,
   onCancel,
 }: {
   mode: string;
-  postID?: number;
+  post?: IPost;
   open: boolean;
   onCancel: () => void;
 }) => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["posts", postID],
-    queryFn: async () =>
-      mode !== "create" &&
-      (await axios
-        .get(`${process.env.BASE_URL}posts/${postID}`)
-        .then((res) => res.data)),
-  });
   const [dataPost, setDataPost] = useState<IPost>({
     title: "",
     body: "",
@@ -48,7 +34,7 @@ const PostModal = ({
     const promise = async () => {
       mode === "create"
         ? await axios.post(`${process.env.BASE_URL}posts`, dataPost)
-        : await axios.put(`${process.env.BASE_URL}posts/${postID}`, dataPost);
+        : await axios.put(`${process.env.BASE_URL}posts/${post?.id}`, dataPost);
     };
 
     toast.promise(promise, {
@@ -56,12 +42,12 @@ const PostModal = ({
       success: `${mode === "create" ? "Create" : "Edit"} post successfully`,
       error: `Failed to ${mode === "create" ? "create" : "edit"} post`,
     });
+    setDataPost({ title: "", body: "" });
     onCancel();
   };
 
   return (
     <Modal
-      loading={isLoading}
       open={open}
       onCancel={onCancel}
       title={
@@ -75,9 +61,11 @@ const PostModal = ({
               type="primary"
               onClick={editOrCreatePost}
               disabled={
-                mode !== "create"
-                  ? !data?.title || !data?.body
-                  : !dataPost.body || !dataPost.title
+                mode === "create"
+                  ? !dataPost.body || !dataPost.title
+                  : mode === "edit"
+                  ? !post?.title || !post?.body
+                  : false
               }
             >
               Apply
@@ -88,23 +76,29 @@ const PostModal = ({
     >
       {mode !== "expand" ? (
         <div className="space-y-2">
-          {nameArray.map((item) => (
-            <div key={item.id}>
-              <h1 className="font-semibold text-lg">{item.name}</h1>
-              <TextArea
-                allowClear
-                name={item.name}
-                defaultValue={mode === "create" ? dataPost.title : data?.title}
-                onChange={changeHandlerPost}
-                autoSize
-              />
-            </div>
-          ))}
+          <div>
+            <h1 className="font-semibold text-lg">Title:</h1>
+             <TransformTextarea
+              isCreate={mode === "create" ? true : false}
+              name="title"
+              value={mode === "create" ? dataPost.title : post?.title as string}
+              onChange={changeHandlerPost}
+            />
+          </div>
+          <div>
+            <h1 className="font-semibold text-lg">Body:</h1>
+            <TransformTextarea
+              isCreate={mode === "create" ? true : false}
+              name="body"
+              value={mode === "create" ? dataPost.body : post?.body as string}
+              onChange={changeHandlerPost}
+            />
+          </div>
         </div>
       ) : (
         <div>
-          <h1 className="font-semibold text-lg">{data?.title}</h1>
-          <p>{data?.body}</p>
+          <h1 className="font-semibold text-lg">{post?.title}</h1>
+          <p>{post?.body}</p>
         </div>
       )}
     </Modal>
