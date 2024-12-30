@@ -1,125 +1,111 @@
 "use client";
+import { IPost } from "@/types/post";
 import { Button, Modal } from "antd";
-import axios from "axios";
+import TextArea from "antd/es/input/TextArea";
 import React, { ChangeEventHandler, useState } from "react";
 import { useQuery } from "react-query";
-import Edit from "../icons/edit";
-import { Input } from "antd";
+import axios from "axios";
 import { toast } from "react-toastify";
-const { TextArea } = Input;
 
-interface IEditPost {
-  title: string;
-  body: string;
-}
+const nameArray = [
+  { id: 1, name: "title" },
+  { id: 2, name: "body" },
+];
 
 const PostModal = ({
+  mode,
   postID,
   open,
-  onCancel
+  onCancel,
 }: {
-  postID: number;
+  mode: string;
+  postID?: number;
   open: boolean;
   onCancel: () => void;
 }) => {
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [editDataPost, setEditDataPost] = useState<IEditPost>({
+  const { data, isLoading } = useQuery({
+    queryKey: ["posts", postID],
+    queryFn: async () =>
+      mode !== "create" &&
+      (await axios
+        .get(`${process.env.BASE_URL}posts/${postID}`)
+        .then((res) => res.data)),
+  });
+  const [dataPost, setDataPost] = useState<IPost>({
     title: "",
     body: "",
   });
-  const { data, isLoading } = useQuery({
-    queryKey: ["post", `postID:${postID}`],
-    queryFn: async () =>
-      await axios
-        .get(`${process.env.BASE_URL}posts/${postID}`)
-        .then((res) => res.data),
-  });
 
-  const editPost = async () => {
-    setIsEdit(true)
-    if (isEdit) {
-      const promise = async () => {
-        await axios.put(`${process.env.BASE_URL}posts/${postID}`, {
-          ...data,
-          ...editDataPost,
-        });
-      };
-      toast.promise(promise, {
-        pending: "Edit post is pending...",
-        success: "Edit post successfully",
-        error: "Failed to edit post",
-      });
-      setIsEdit(false)
-      onCancel()
-    }
-
+  const changeHandlerPost: ChangeEventHandler = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    setDataPost({ ...dataPost, [name]: value });
   };
 
-  const handleTitlePost: ChangeEventHandler = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => setEditDataPost({ ...editDataPost, title: e.target.value });
-  const handleBodyPost: ChangeEventHandler = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => setEditDataPost({ ...editDataPost, body: e.target.value });
-  const clearEditData = () => setEditDataPost({ title: "", body: "" });
+  const editOrCreatePost = () => {
+    const promise = async () => {
+      mode === "create"
+        ? await axios.post(`${process.env.BASE_URL}posts`, dataPost)
+        : await axios.put(`${process.env.BASE_URL}posts/${postID}`, dataPost);
+    };
+
+    toast.promise(promise, {
+      pending: `${mode === "create" ? "Create" : "Edit"} post is pending...`,
+      success: `${mode === "create" ? "Create" : "Edit"} post successfully`,
+      error: `Failed to ${mode === "create" ? "create" : "edit"} post`,
+    });
+    onCancel();
+  };
+
   return (
     <Modal
+      loading={isLoading}
       open={open}
       onCancel={onCancel}
-      afterClose={() => {
-        setIsEdit(false)
-        setEditDataPost({ title: "", body: "" })
-      }}
-      footer={
-        <div className="flex justify-end space-x-2">
-          {isEdit && (
-            <Button
-              onClick={clearEditData}
-              disabled={editDataPost.title === "" && editDataPost.body === ""}
-            >
-              Clear
-            </Button>
-          )}
-          <Button
-            type="primary"
-            icon={!isEdit && <Edit />}
-            onClick={editPost}
-            disabled={isEdit && (editDataPost.title === "" || editDataPost.body === "")}
-          >
-            {isEdit ? "Apply" : "Edit"}
-          </Button>
-        </div>
+      title={
+        mode === "create" ? "Create post" : mode === "edit" ? "Edit post" : null
       }
-      classNames={{
-        body: "my-4",
-      }}
-      closable={false}
-      loading={isLoading}
+      closable={mode === "expand" ? false : true}
+      footer={
+        <>
+          {mode !== "expand" ? (
+            <Button
+              type="primary"
+              onClick={editOrCreatePost}
+              disabled={
+                mode !== "create"
+                  ? !data?.title || !data?.body
+                  : !dataPost.body || !dataPost.title
+              }
+            >
+              Apply
+            </Button>
+          ) : null}
+        </>
+      }
     >
-      {isEdit ? (
+      {mode !== "expand" ? (
         <div className="space-y-2">
-          <div>
-            <h1 className="font-semibold text-lg">Title:</h1>
-            <TextArea
-              value={editDataPost.title}
-              onChange={handleTitlePost}
-              autoSize
-            />
-          </div>
-          <div>
-            <h1 className="font-semibold text-lg">Body:</h1>
-            <TextArea
-              value={editDataPost.body}
-              onChange={handleBodyPost}
-              autoSize
-            />
-          </div>
+          {nameArray.map((item) => (
+            <div key={item.id}>
+              <h1 className="font-semibold text-lg">{item.name}</h1>
+              <TextArea
+                allowClear
+                name={item.name}
+                defaultValue={mode === "create" ? dataPost.title : data?.title}
+                onChange={changeHandlerPost}
+                autoSize
+              />
+            </div>
+          ))}
         </div>
       ) : (
-        <>
+        <div>
           <h1 className="font-semibold text-lg">{data?.title}</h1>
           <p>{data?.body}</p>
-        </>
+        </div>
       )}
     </Modal>
   );

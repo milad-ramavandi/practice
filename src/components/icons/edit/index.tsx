@@ -1,7 +1,7 @@
 "use client";
-import React, { MouseEventHandler } from "react";
+import React from "react";
 
-const Edit = () => {
+const Edit = ({onClick}:{onClick:() => void}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -9,7 +9,8 @@ const Edit = () => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="size-4"
+      className="size-6"
+      onClick={onClick}
     >
       <path
         strokeLinecap="round"

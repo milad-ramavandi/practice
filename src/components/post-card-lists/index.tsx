@@ -9,6 +9,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useQueryClient } from "react-query";
 import PostModal from "../post-Modal";
+import Edit from "../icons/edit";
 
 const PostCardLists = ({
   isLoading,
@@ -18,6 +19,7 @@ const PostCardLists = ({
   posts: IPost[];
 }) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [modeModal, setModeModal] = useState<string>("")
   const [postID, setPostID] = useState<number>(1);
   const queryClient = useQueryClient();
   const deletePost = (postID: number) => {
@@ -33,7 +35,13 @@ const PostCardLists = ({
 
     queryClient.invalidateQueries("posts");
   };
-  const showModal = (postID: number) => {
+  const showExpandModal = (postID: number) => {
+    setModeModal("expand")
+    setIsModalOpen(true);
+    setPostID(postID);
+  };
+  const showEditModal = (postID: number) => {
+    setModeModal("edit");
     setIsModalOpen(true);
     setPostID(postID);
   };
@@ -51,8 +59,9 @@ const PostCardLists = ({
               key={item.id}
               title={item.title}
               actions={[
-                <Delete onClick={() => deletePost(item.id)} />,
-                <Expand onClick={() => showModal(item.id)} />,
+                <Delete onClick={() => deletePost(item.id as number)} />,
+                <Expand onClick={() => showExpandModal(item.id as number)} />,
+                <Edit onClick={() => showEditModal(item.id as number)}/>
               ]}
               className="max-w-[300px]"
               classNames={{
@@ -64,7 +73,7 @@ const PostCardLists = ({
           ))
         )}
       </div>
-      <PostModal postID={postID} open={isModalOpen} onCancel={handleCancel} />
+      <PostModal postID={postID} open={isModalOpen} onCancel={handleCancel} mode={modeModal}/>
     </>
   );
 };

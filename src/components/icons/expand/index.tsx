@@ -1,7 +1,7 @@
 "use client";
-import React, { MouseEventHandler } from "react";
+import React from "react";
 
-const Expand = ({onClick}:{onClick:MouseEventHandler}) => {
+const Expand = ({onClick}:{onClick: () => void}) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
